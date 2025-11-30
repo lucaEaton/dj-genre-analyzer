@@ -49,12 +49,14 @@ class AudioAnalyzer:
         return audio_dictionary
 
 
-def main():
-    filename = "test_audio/Rihanna - S&M (Audio).mp3"
-    audio = AudioAnalyzer(file_path=filename)
 
-    print(audio.get_analysis())
+#def main():
+
+    #filename = "test_audio/John Lennon - Original Imagine Music Video 1971.mp3"
+    #audio = AudioAnalyzer(file_path=filename)
+
+    #print(audio.get_analysis())
 
 
-if __name__ == "__main__":
-    main()
+#if __name__ == "__main__":
+  #  main()
