@@ -1,5 +1,8 @@
-# dj-genre-analyzer
+# Beat Brains
 
+
+NOTES FOR SELF - TEMP
+------
 I first began working with my 'audioAnalyzer.py' file, in order to actually break down the user's
 uploaded audio sources. 
 
