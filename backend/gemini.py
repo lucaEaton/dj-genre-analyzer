@@ -1,13 +1,20 @@
 import os
 import json
 from google import genai
-from backend.audioAnalyzer import AudioAnalyzer
+from audioAnalyzer import AudioAnalyzer
 
 class GeminiClient:
+    # Takes in api key and model
+    # API key is set to default done using .env variables so always leave it blank
+    # sets the client with the api and the model type with the model name passed
+
     def __init__(self, api_key_env_var: str = "GEMINI_API_KEY", model_name: str = 'gemini-2.5-flash'):
         self.client = genai.Client(api_key=os.getenv(api_key_env_var))
         self.model = model_name
 
+    # Analyzes the track extracting its features such as BPM and Key Value
+    # Passes the JSON dictionary into the prompt
+    # Return the response.text
     def build_response(self, file_name: str) -> str:
         audio = AudioAnalyzer(file_path=file_name)
         audio_dictionary = audio.get_analysis()
@@ -41,8 +48,9 @@ class GeminiClient:
 
         return response.text
 
+# testing purposes
 def main():
-    #testing purposes
+
    filename = "../test_audio/John Lennon - Original Imagine Music Video 1971.mp3"
    gemini_client = GeminiClient(model_name='gemini-2.5-flash')
 

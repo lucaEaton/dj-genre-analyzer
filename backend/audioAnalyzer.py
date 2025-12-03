@@ -1,11 +1,16 @@
 import math
+
+import os
+os.environ["LIBROSA_CACHE_DIR"] = "/tmp"
+os.environ["LIBROSA_NO_CACHE"] = "1"
+
 import librosa
 from librosa import feature
-import numpy as np
-import os
 
+import numpy as np
 
 KEYS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+
 
 class AudioAnalyzer:
     def __init__(self, file_path):
@@ -47,15 +52,13 @@ class AudioAnalyzer:
 
         return audio_dictionary
 
+# def main():
+
+# filename = "test_audio/John Lennon - Original Imagine Music Video 1971.mp3"
+# audio = AudioAnalyzer(file_path=filename)
+
+# print(audio.get_analysis())
 
 
-#def main():
-
-    #filename = "test_audio/John Lennon - Original Imagine Music Video 1971.mp3"
-    #audio = AudioAnalyzer(file_path=filename)
-
-    #print(audio.get_analysis())
-
-
-#if __name__ == "__main__":
-  #  main()
+# if __name__ == "__main__":
+#  main()
