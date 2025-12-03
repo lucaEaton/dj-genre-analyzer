@@ -1,45 +1,44 @@
 import os
-from flask import Flask, render_template, redirect, url_for, flash
-from flask_wtf import FlaskForm
-from wtforms import FileField, SubmitField
-from wtforms.validators import DataRequired
-from werkzeug.utils import secure_filename
-from gemini import GeminiClient
+import tempfile
+from fastapi import FastAPI, UploadFile, File
+from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+from .gemini import GeminiClient
 
-app = Flask(__name__, template_folder="templates")
+load_dotenv()
+load_dotenv(
+    os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "../.env"
+    )
+)
 
-app.config["SECRET_KEY"] = "secert_key"
-app.config["UPLOAD_FOLDER"] = "uploads"
-app.config["MAX_CONTENT_LENGTH"] = 50 * 1024 * 1024
+app = FastAPI()
 
-os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-class UploadFileForm(FlaskForm):
-    file = FileField("Audio file", validators=[DataRequired()])
-    submit = SubmitField("Upload Audio")
+gemini_client = GeminiClient(model_name="gemini-2.5-flash")
 
+@app.post("/analyze")
+async def analyze_track(file: UploadFile = File(...)):
+    if not gemini_client:
+        return {"error": "Gemini API Key not set."}
 
-@app.route("/", methods=["GET", "POST"])
-def home():
-    form = UploadFileForm()
-    gemini_output = None  # default empty
+    with tempfile.NamedTemporaryFile(delete=False, suffix=f"_{file.filename}") as temp:
+        content = await file.read()
+        temp.write(content)
+        temp_name = temp.name
 
-    if form.validate_on_submit():
-        file = form.file.data
-        filename = secure_filename(file.filename)
-
-        save_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
-        file.save(save_path)
-
-        client = GeminiClient(model_name="gemini-2.5-flash")
-        gemini_output = client.build_response(file_name=save_path)
-
-        flash("File processed successfully!", "success")
-
-        return render_template("index.html", form=form, output=gemini_output)
-
-    return render_template("index.html", form=form, output=gemini_output)
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
+    try:
+        result_text = gemini_client.build_response(temp_name)
+        return {"result": result_text}
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        if os.path.exists(temp_name):
+            os.remove(temp_name)

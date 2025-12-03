@@ -1,0 +1,17 @@
+# environment files
+.env
+
+# python venv
+venv/
+venv311/
+env/
+
+# compiled python
+__pycache__/
+*.pycca
+
+# macos
+.DS_Store
+
+# node
+frontend/node_modules/
